@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw2</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    body {
+      margin: 0px;
+      font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+      background-color: #f8ede6;
+    }
+
+    .headerBackground {
+      background-image: url("04_thanksgiving_leaves.jpg");
+      background-size: cover;
+      height: 350px;
+      width: 100%;
+    }
+
+    .formContent {
+      background-color: white;
+      max-width: 700px;
+      margin: auto;
+      margin-top: -100px;
+      padding: 50px 30px
+    }
+
+    .title {    
+      font-size: 38px;
+      padding: 0px 20px;
+    }
+
+    .description {
+      padding: 0px 20px;
+    }
+
+    .notice {
+      color: red;
+    }
+
+    .formInputWrap {
+      padding: 10px 0px;
+    }
+
+    .formInputWrap.err {
+      background-color: #fce8e6;
+    }
+
+    .inputTitle {
+      font-size: 25px;
+      margin: 20px;
+    }
+
+    .formInputWrap .inputTitle {
+      display: block;
+    }
+
+    .inputTitle.required::after{
+      content:"*";
+      color:red;
+    }
+
+    .formInputWrap .inputBlock {
+      display: block;
+      margin: 20px;
+      font-size: 22px;
+      border: none;
+      border-bottom: #e0e0e0 1px solid;
+      padding-bottom: 7px;
+      min-width: 350px;
+    }
+
+    .formInputWrap.err .inputBlock {
+      background-color: #fce8e6;
+    }
+
+    .errMsg {
+      font-size: 20px;
+      display: block;
+      margin: 20px;
+      color: red;
+
+    }
+  </style>
+</head>
+<body>
+  <div class="headerBackground"></div>
+  <div class="formWrap">
+    <div class="formContent">
+      <h1 class="title">程式導師實驗計畫第三期報名表單</h1>
+      <p class="description">
+        詳情請參考：
+          <a href="https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3" target="_blank">https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3</a>
+      </p>
+      <p class="description">
+        填完之後請務必按照文章內的說明再寄信給我，才算報名成功喔
+      </p>
+      <p class="description notice">
+        *必填
+      </p>
+      <form>
+        <div class="formInputWrap err">
+          <label class="inputTitle required" for="email">電子郵件地址</label>
+          <input class="inputBlock" type="text" id="email" name="email" placeholder="你的電子郵件">
+          <div class="errMsg">
+            請輸入有效的電子郵件地址
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

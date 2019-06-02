@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw1</title>
+  <style type="text/css">
+    .flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 600px;
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex">
+    <h1>畫面變色時請點擊</h1>
+    <button class="hide" id="tryAgain">再玩一次</button>
+  </div>
+</body>
+</html>
+
+<script type="text/javascript">
+  var stopGame = false;
+  var timeStart;
+  var colorChanged = false;
+  var colorChnageTimeout;
+
+  changeBackgroundColorInRandomSec();
+
+  // 取得成績，結束遊戲
+  document.querySelector("body").addEventListener("click", grade);
+  window.addEventListener("keydown", function(event) {
+    if (event.keyCode === 32) {  // space
+      grade();
+      event.preventDefault();
+    }
+  });
+
+  // 再玩一次
+  document.querySelector("#tryAgain").addEventListener("click", function(event) {
+    tryAgin();
+    event.stopPropagation();
+  });
+
+  window.addEventListener("keydown", function(event) {
+    if (event.keyCode === 82 && stopGame) {  // r
+        tryAgin();
+    }
+  });
+
+
+  function changeBackgroundColorInRandomSec() {
+    stopGame = false;
+    colorChnageTimeout = setTimeout(function() {
+      changeBodyColor(randomColor());
+      timeStart = Date.now();
+      colorChanged = true;
+    }, randomWithRange(1000, 3000));
+  }
+
+  function grade() {
+    if(!stopGame) {
+      if(colorChanged) {
+        alert(`你的成績： ${(Date.now() - timeStart) / 1000 } 秒`);
+      } else {
+        alert("還沒變色喔，失敗!!!");
+        clearTimeout(colorChnageTimeout);
+      }
+      toggleTryAgain();
+      stopGame = true;
+    }
+  }
+
+  function tryAgin() {
+    colorChanged = false;
+    changeBodyColor("white");
+    changeBackgroundColorInRandomSec();
+    toggleTryAgain();
+  }
+
+  function changeBodyColor(color) {
+    document.querySelector("body").style.backgroundColor = color;
+  }
+
+  function toggleTryAgain() {
+    document.getElementById("tryAgain").classList.toggle("hide");
+  }
+
+  function randomColor() {
+    return `rgb(${randomWithRange(0, 255)},${randomWithRange(0, 255)},${randomWithRange(0, 255)})`;
+  }
+
+  function randomWithRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min; 
+  }
+
+</script>
