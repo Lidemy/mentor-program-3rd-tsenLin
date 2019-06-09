@@ -19,20 +19,23 @@
     }
 
     .formContent {
-      background-color: white;
       max-width: 700px;
       margin: auto;
+    }
+
+    form {
+      background-color: white;
       margin-top: -100px;
       padding: 50px 30px
     }
 
     .title {    
       font-size: 38px;
-      padding: 0px 20px;
+      margin:25px 20px;
     }
 
     .description {
-      padding: 0px 20px;
+      margin:20px;
     }
 
     .notice {
@@ -40,7 +43,8 @@
     }
 
     .formInputWrap {
-      padding: 10px 0px;
+      padding: 20px;
+      margin-top: 2px;
     }
 
     .formInputWrap.err {
@@ -49,21 +53,29 @@
 
     .inputTitle {
       font-size: 25px;
-      margin: 20px;
     }
 
-    .formInputWrap .inputTitle {
+    .inputTitle {
       display: block;
     }
 
     .inputTitle.required::after{
       content:"*";
       color:red;
+      padding-left: 10px;
     }
 
-    .formInputWrap .inputBlock {
+    .inputDescription {
       display: block;
-      margin: 20px;
+      margin-top: 5px;
+    }
+
+    .inputBlockWrap {
+      margin: 20px 0px;
+    }
+
+    .inputBlock {
+      display: inline-block;
       font-size: 22px;
       border: none;
       border-bottom: #e0e0e0 1px solid;
@@ -71,16 +83,49 @@
       min-width: 350px;
     }
 
+    .inputBlock:focus {
+      border-bottom: rgb(186, 71, 8) 2px solid;
+      outline: none;
+    }
+
     .formInputWrap.err .inputBlock {
       background-color: #fce8e6;
     }
 
-    .errMsg {
+    .formInputWrap .errMsg {
+      display: none;
+    }
+
+    .formInputWrap.err .errMsg {
       font-size: 20px;
       display: block;
-      margin: 20px;
       color: red;
+    }
 
+    textarea.inputBlock {
+      line-height: 26px;
+      min-width: 100%;
+      overflow: hidden;
+    }
+
+    .btn {
+      padding: 12px 37px;
+      background-color: #1a73e8;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 18px;
+      border: none;
+    }
+
+    footer {
+      text-align: center;
+      margin: 50px auto;
+    }
+
+    .footerTitle {
+      font-size: 30px;
+      color: #c1c1c1ee;
+      padding: 30px;
     }
   </style>
 </head>
@@ -88,28 +133,232 @@
   <div class="headerBackground"></div>
   <div class="formWrap">
     <div class="formContent">
-      <h1 class="title">程式導師實驗計畫第三期報名表單</h1>
-      <p class="description">
-        詳情請參考：
-          <a href="https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3" target="_blank">https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3</a>
-      </p>
-      <p class="description">
-        填完之後請務必按照文章內的說明再寄信給我，才算報名成功喔
-      </p>
-      <p class="description notice">
-        *必填
-      </p>
-      <form>
-        <div class="formInputWrap err">
+      <form id="lidemy">
+        <h1 class="title">程式導師實驗計畫第三期報名表單</h1>
+        <p class="description">
+          詳情請參考：
+            <a href="https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3" target="_blank">https://medium.com/hulis-blog/mentor-program-3rd-47a2e85e33b3</a>
+        </p>
+        <p class="description">
+          填完之後請務必按照文章內的說明再寄信給我，才算報名成功喔
+        </p>
+        <p class="description notice">
+          *必填
+        </p>
+
+        <div class="formInputWrap">
           <label class="inputTitle required" for="email">電子郵件地址</label>
-          <input class="inputBlock" type="text" id="email" name="email" placeholder="你的電子郵件">
-          <div class="errMsg">
-            請輸入有效的電子郵件地址
+          <span class="inputDescription"></span>
+          <div class="inputBlockWrap">
+            <input class="inputBlock" type="email" id="email" name="email" placeholder="你的電子郵件" data-validation="required,email">
           </div>
+          <div class="errMsg"></div>
         </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle required" for="name">暱稱</label>
+          <span class="inputDescription">該如何稱呼你</span>
+          <div class="inputBlockWrap">
+            <input class="inputBlock" type="text" id="name" name="name" placeholder="您的回答" data-validation="required">
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle required">報名類型</label>
+          <span class="inputDescription"></span>
+          <div class="inputBlockWrap">
+            <input class="inputBlock" type="radio" id="lessonType1" name="lessonType" value="1" data-validation="requiredRadio">
+            <label for="lessonType1"> 從零到一基礎班（兩個月後開始收保證金 5000，淘汰不退還，結業後兩個月內找到工作付一個月半薪水，沒工作不用付）</label>
+            <br>
+            <br>
+            <input class="inputBlock" type="radio" id="lessonType2" name="lessonType" value="2" data-validation="requiredRadio">
+            <label for="lessonType2"> 在職工程師加強班（兩個月後開始收保證金 5000，三個月時收學費 35000 元台幣，被淘汰不退還）</label>
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle required" for="name">現在的職業</label>
+          <span class="inputDescription">範例：學生、前端工程師、待業中、業務</span>
+          <div class="inputBlockWrap">
+            <input class="inputBlock" type="text" id="job" name="job" placeholder="您的回答" data-validation="required">
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle required" for="name">怎麼知道這個計畫的？</label>
+          <div class="inputBlockWrap">
+            <input class="inputBlock" type="text" id="howToKnow" name="howToKnow" placeholder="您的回答" data-validation="required">
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle required" for="name">是否有程式相關背景？</label>
+          <span class="inputDescription">範例：無、高中時候學過C++、學過一點網頁前端、目前在資策會上課...</span>
+          <div class="inputBlockWrap">
+            <textarea class="inputBlock" type="text" id="relatedBackground" name="relatedBackground" placeholder="您的回答" rows="1" data-validation="required"></textarea>
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <label class="inputTitle" for="name">其他</label>
+          <span class="inputDescription">任何你想說的</span>
+          <div class="inputBlockWrap">
+            <textarea class="inputBlock" type="text" id="others" name="others" placeholder="您的回答" rows="1"></textarea>
+          </div>
+          <div class="errMsg"></div>
+        </div>
+
+        <div class="formInputWrap">
+          <button class="btn">提交</button>
+        </div>
+
+        <p class="description">請勿利用 Google 表單送出密碼。</p>
       </form>
+
+      <footer>
+        <div class="serviceTerm">Google 並未認可或建立這項內容。 檢舉濫用情形 - 服務條款</div>
+        <div class="footerTitle">Google 表單</div>
+      </footer>
+
     </div>
   </div>
 
+  
 </body>
 </html>
+
+<script type="text/javascript">
+  document.querySelectorAll("textarea").forEach(function(element) {
+    element.addEventListener("keyup", textareaAdjustHigh);
+    element.addEventListener("paste", textareaAdjustHigh);
+  });
+
+  function textareaAdjustHigh(element) {
+    element.target.style.height = (element.target.scrollHeight - 10) + "px";
+  }
+
+  document.querySelectorAll(".inputBlock").forEach(function(element) {
+    if(element.dataset.validation) {
+      element.addEventListener("focusout", validateEvent);
+    }
+  });
+
+  function validateEvent(event) {
+    validate(event.target);
+  }
+
+  function validate(element) {
+    let checkList = element.dataset.validation.split(",");
+    let value = element.value;
+    let valid = true;
+
+    for(let i = 0; i < checkList.length; i = i + 1) {
+      let item = checkList[i];
+      let errMsg = "";
+
+      switch(item) {
+        case "required":
+          valid = validateRequired(value);
+          errMsg = "這是必填問題";
+          break;
+        case "email":
+          valid = validateEmail(value);
+          errMsg = "請輸入有效的電子郵件地址";
+          break;
+        case "requiredRadio":
+          valid = (getRadioValue(element.name))?true:false;
+            errMsg = "這是必填問題";
+          break;
+      }
+
+      if(!valid) {
+        showErrMsg(element, errMsg);
+        return false;
+      }
+    };
+
+    if(valid) {
+      hideErrMsg(element);
+    }
+
+    return valid;
+  }
+
+
+  document.querySelector("#lidemy").addEventListener("submit", submitForm);
+
+  function submitForm(element) {
+    element.preventDefault();
+
+    let valid = true;
+
+    document.querySelectorAll(".inputBlock").forEach(function(element) {
+      if(element.dataset.validation) {
+        valid = validate(element) && valid;
+      }
+    });
+
+    if(!valid) {
+      return false;
+    }
+
+    let email = document.querySelector('input[name="email"]').value;
+    let name = document.querySelector('input[name="name"]').value;
+    let lessonType = getRadioValue("lessonType");
+    let job = document.querySelector('input[name="job"]').value;
+    let howToKnow = document.querySelector('input[name="howToKnow"]').value;
+    let relatedBackground = document.querySelector('textarea[name="relatedBackground"]').value;
+    let others = document.querySelector('textarea[name="others"]').value;
+
+    console.log(`
+        submit !!!!!!!!!!! 
+        email = ${email}
+        name = ${name}
+        lessonType = ${lessonType}
+        job = ${job}
+        howToKnow = ${howToKnow}
+        relatedBackground = ${relatedBackground}
+        others = ${others}
+      `);
+
+    alert("提交成功");
+  }
+
+  function showErrMsg(inputElement, errMsg) {
+    let formInputWrap = inputElement.parentElement.parentElement;
+    let msgEle = formInputWrap.querySelector(".errMsg");
+
+    msgEle.innerHTML = errMsg;
+    formInputWrap.classList.add("err");
+  }
+
+  function hideErrMsg(inputElement) {
+    let formInputWrap = inputElement.parentElement.parentElement;
+    formInputWrap.classList.remove("err");
+  }
+
+  function validateRequired(text) {
+    return (text.trim().length > 0)?true:false;
+  }
+
+  function validateEmail(email) {
+    let emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+    return emailRule.test(email.trim())
+  }
+
+  function getRadioValue(name) {
+    let value;
+    document.querySelectorAll(`input[name=${name}]`).forEach(function(element){
+      if(element.checked) {
+        value = element.value;
+      }
+    });
+
+    return value;
+  }
+</script>
