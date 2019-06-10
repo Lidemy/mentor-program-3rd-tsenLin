@@ -81,75 +81,83 @@
 
 <script>
 var sum = 0;
-var preOperator = '';
+var operator = 'plus';
+var x = 0;
 var clear = true;
 
 document.querySelectorAll('.num').forEach((el) => {
   el.addEventListener('click', (event) => {
-    const result = document.getElementById('result');
+    const resultEle = document.getElementById('result');
+    const value = event.target.dataset.value;
+
     if (clear) {
-      result.innerHTML = event.target.dataset.value;
+      if (value !== '.') {
+        resultEle.innerHTML = value;
+      } else {
+        resultEle.innerHTML = '0.';
+      }
       clear = false;
     } else {
-      result.innerHTML = `${result.innerHTML}${event.target.dataset.value}`;
+      resultEle.innerHTML = `${resultEle.innerHTML}${value}`;
     }
+    x = parseFloat(resultEle.innerHTML, 10);
+
   }, false);
 });
 
 document.querySelectorAll('.operator').forEach((el) => {
   el.addEventListener('click', (event) => {
-    const operator = event.target.dataset.value;
-    const resultEle = document.getElementById('result');
+    const thisOperator = event.target.dataset.value;
 
-    if (operator !== 'equal') {
-      preOperator = operator;
+    if (!clear || thisOperator === 'equal') {
+      operate();
     }
 
-    operate(preOperator, parseInt(resultEle.innerHTML, 10));
+    if (thisOperator !== 'equal') {
+      operator = thisOperator;
+      x = 0;
+    }
 
-    resultEle.innerHTML = sum;
-    console.log("sum " + sum);
-
+    document.getElementById('result').innerHTML = sum;
     clear = true;
   }, false);
 });
 
-function operate(operator, y) {
-  console.log(`operatory: ${operator} y: ${y}`);
-  if (y === 0) {
-    return;
-  }
-
-  if (sum === 0) {
-    sum = y;
+function operate() {
+  console.log(`sum: ${sum} operatory: ${operator} x: ${x}`);
+  if (x === 0) {
     return;
   }
 
   switch (operator) {
     case 'plus':
-      sum += y;
+      sum += x;
       break;
 
     case 'minus':
-      sum -= y;
+      sum -= x;
       break;
 
     case 'multi':
-      sum *= y;
+      sum *= x;
       break;
 
     case 'divide':
-      sum /= y;
+      sum /= x;
       break;
 
     default:
       break;
   }
+
+  sum = Math.round(sum * 1000000000)/1000000000;
 }
 
 document.getElementById('reset').addEventListener('click', (el) => {
   sum = 0;
+  operator = 'plus';
+  x = 0;
+  clear = true;
   document.getElementById('result').innerHTML = sum;
-  // preOperator = '';
 }, false);
 </script>
