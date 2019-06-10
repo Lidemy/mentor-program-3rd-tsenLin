@@ -26,7 +26,9 @@
     form {
       background-color: white;
       margin-top: -100px;
-      padding: 50px 30px
+      padding: 50px 30px;
+      border-top: rgb(255, 137, 75) 10px solid;
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
     }
 
     .title {    
@@ -92,6 +94,10 @@
       background-color: #fce8e6;
     }
 
+    .formInputWrap.err .inputBlock{
+      border-bottom: red 1px solid;
+    }
+
     .formInputWrap .errMsg {
       display: none;
     }
@@ -126,6 +132,13 @@
       font-size: 30px;
       color: #c1c1c1ee;
       padding: 30px;
+    }
+
+    @media (max-width: 660px) {
+      .formContent {
+        max-width: 600px;
+        margin: 0px 25px;
+      }
     }
   </style>
 </head>
@@ -233,132 +246,135 @@
 </html>
 
 <script type="text/javascript">
-  document.querySelectorAll("textarea").forEach(function(element) {
-    element.addEventListener("keyup", textareaAdjustHigh);
-    element.addEventListener("paste", textareaAdjustHigh);
-  });
 
-  function textareaAdjustHigh(element) {
-    element.target.style.height = (element.target.scrollHeight - 10) + "px";
+document.querySelectorAll('textarea').forEach((element) => {
+  element.addEventListener('keyup', textareaAdjustHigh);
+  element.addEventListener('paste', textareaAdjustHigh);
+});
+
+function textareaAdjustHigh(element) {
+  element.target.style.height = `${element.target.scrollHeight - 10}px`;
+}
+
+document.querySelectorAll('.inputBlock').forEach((element) => {
+  if (element.dataset.validation) {
+    element.addEventListener('focusout', validateEvent);
   }
+});
 
-  document.querySelectorAll(".inputBlock").forEach(function(element) {
-    if(element.dataset.validation) {
-      element.addEventListener("focusout", validateEvent);
-    }
-  });
+function validateEvent(event) {
+  validate(event.target);
+}
 
-  function validateEvent(event) {
-    validate(event.target);
-  }
+function validate(element) {
+  const checkList = element.dataset.validation.split(',');
+  const value = element.value;
+  let valid = true;
 
-  function validate(element) {
-    let checkList = element.dataset.validation.split(",");
-    let value = element.value;
-    let valid = true;
+  for (let i = 0; i < checkList.length; i = i + 1) {
+    const item = checkList[i];
+    let errMsg = '';
 
-    for(let i = 0; i < checkList.length; i = i + 1) {
-      let item = checkList[i];
-      let errMsg = "";
-
-      switch(item) {
-        case "required":
-          valid = validateRequired(value);
-          errMsg = "這是必填問題";
-          break;
-        case "email":
-          valid = validateEmail(value);
-          errMsg = "請輸入有效的電子郵件地址";
-          break;
-        case "requiredRadio":
-          valid = (getRadioValue(element.name))?true:false;
-            errMsg = "這是必填問題";
-          break;
-      }
-
-      if(!valid) {
-        showErrMsg(element, errMsg);
-        return false;
-      }
-    };
-
-    if(valid) {
-      hideErrMsg(element);
+    switch (item) {
+      case 'required':
+        valid = validateRequired(value);
+        errMsg = '這是必填問題';
+        break;
+      case 'email':
+        valid = validateEmail(value);
+        errMsg = '請輸入有效的電子郵件地址';
+        break;
+      case 'requiredRadio':
+        valid = (getRadioValue(element.name)) ? true : false;
+        errMsg = '這是必填問題';
+        break;
+      default:
+        break;
     }
 
-    return valid;
-  }
-
-
-  document.querySelector("#lidemy").addEventListener("submit", submitForm);
-
-  function submitForm(element) {
-    element.preventDefault();
-
-    let valid = true;
-
-    document.querySelectorAll(".inputBlock").forEach(function(element) {
-      if(element.dataset.validation) {
-        valid = validate(element) && valid;
-      }
-    });
-
-    if(!valid) {
+    if (!valid) {
+      showErrMsg(element, errMsg);
       return false;
     }
-
-    let email = document.querySelector('input[name="email"]').value;
-    let name = document.querySelector('input[name="name"]').value;
-    let lessonType = getRadioValue("lessonType");
-    let job = document.querySelector('input[name="job"]').value;
-    let howToKnow = document.querySelector('input[name="howToKnow"]').value;
-    let relatedBackground = document.querySelector('textarea[name="relatedBackground"]').value;
-    let others = document.querySelector('textarea[name="others"]').value;
-
-    console.log(`
-        submit !!!!!!!!!!! 
-        email = ${email}
-        name = ${name}
-        lessonType = ${lessonType}
-        job = ${job}
-        howToKnow = ${howToKnow}
-        relatedBackground = ${relatedBackground}
-        others = ${others}
-      `);
-
-    alert("提交成功");
   }
 
-  function showErrMsg(inputElement, errMsg) {
-    let formInputWrap = inputElement.parentElement.parentElement;
-    let msgEle = formInputWrap.querySelector(".errMsg");
-
-    msgEle.innerHTML = errMsg;
-    formInputWrap.classList.add("err");
+  if (valid) {
+    hideErrMsg(element);
   }
 
-  function hideErrMsg(inputElement) {
-    let formInputWrap = inputElement.parentElement.parentElement;
-    formInputWrap.classList.remove("err");
+  return valid;
+}
+
+
+function submitForm(element) {
+  let valid = true;
+
+  document.querySelectorAll('.inputBlock').forEach((el) => {
+    if (el.dataset.validation) {
+      valid = validate(el) && valid;
+    }
+  });
+
+  if (!valid) {
+    element.preventDefault();
+    return false;
   }
 
-  function validateRequired(text) {
-    return (text.trim().length > 0)?true:false;
-  }
+  const email = document.querySelector('input[name="email"]').value;
+  const name = document.querySelector('input[name="name"]').value;
+  const lessonType = getRadioValue('lessonType');
+  const job = document.querySelector('input[name="job"]').value;
+  const howToKnow = document.querySelector('input[name="howToKnow"]').value;
+  const relatedBackground = document.querySelector('textarea[name="relatedBackground"]').value;
+  const others = document.querySelector('textarea[name="others"]').value;
 
-  function validateEmail(email) {
-    let emailRule = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
-    return emailRule.test(email.trim())
-  }
+  console.log(`
+      submit !!!!!!!!!!! 
+      email = ${email}
+      name = ${name}
+      lessonType = ${lessonType}
+      job = ${job}
+      howToKnow = ${howToKnow}
+      relatedBackground = ${relatedBackground}
+      others = ${others}
+    `);
 
-  function getRadioValue(name) {
-    let value;
-    document.querySelectorAll(`input[name=${name}]`).forEach(function(element){
-      if(element.checked) {
-        value = element.value;
-      }
-    });
+  alert('提交成功');
+}
 
-    return value;
-  }
+document.querySelector('#lidemy').addEventListener('submit', submitForm, false);
+
+
+function showErrMsg(inputElement, errMsg) {
+  const formInputWrap = inputElement.parentElement.parentElement;
+  const msgEle = formInputWrap.querySelector('.errMsg');
+
+  msgEle.innerHTML = errMsg;
+  formInputWrap.classList.add('err');
+}
+
+function hideErrMsg(inputElement) {
+  const formInputWrap = inputElement.parentElement.parentElement;
+  formInputWrap.classList.remove('err');
+}
+
+function validateRequired(text) {
+  return (text.trim().length > 0);
+}
+
+function validateEmail(email) {
+  const emailRule = /^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+  return emailRule.test(email.trim());
+}
+
+function getRadioValue(name) {
+  let value;
+  document.querySelectorAll(`input[name=${name}]`).forEach((element) => {
+    if (element.checked) {
+      value = element.value;
+    }
+  });
+
+  return value;
+}
 </script>
