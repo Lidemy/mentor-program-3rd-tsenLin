@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Accordion</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    .contentWrap > .groupWrap {
+        border: 1px solid rgba(0,0,0,.125);
+        border-bottom: none;
+    }
+
+    .contentWrap > .groupWrap:first-child {
+        border-radius: 5px 5px 0px 0px;
+    }
+
+    .contentWrap > .groupWrap:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        border-radius: 0px 0px 5px 5px;
+    }
+
+    .groupTitle {
+        padding: 20px;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+        background-color: rgba(0,0,0,.03);
+        -webkit-transition: border-bottom .5s ease-out;
+        transition: border-bottom .5s ease-out;
+    }
+
+    .groupWrap.hide > .groupTitle {
+        border-bottom: 1px solid rgba(0,0,0,0);
+    }
+
+    .groupContent {
+        overflow: hidden;
+        -webkit-transition: height .5s ease-out, border-bottom .5s ease-out;
+        transition: height .5s ease-out, border-bottom .5s ease-out;
+    }
+
+    .groupContent > p {
+        padding:20px;
+    }
+
+    .switchBtn {
+        font-weight: 400;
+        color: #007bff;
+        font-size: 20px;
+        background-color: rgba(0,0,0,0);
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    .switchBtn:focus {
+        outline: none;
+    }
+
+    .switchBtn:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+    <div class="contentWrap">
+        <div class="groupWrap" id="group1">
+            <div class="groupTitle">
+                <button class="switchBtn" type="button" data-for="group1">Collapsible Group Item #1</button>
+            </div>
+            <div class="groupContent">
+                <p>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </p>
+            </div>
+        </div>
+        <div class="groupWrap" id="group2">
+            <div class="groupTitle">
+                <button class="switchBtn" type="button" data-for="group2">Collapsible Group Item #2</button>
+            </div>
+            <div class="groupContent">
+                <p>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </p>
+            </div>
+        </div>
+        <div class="groupWrap" id="group3">
+            <div class="groupTitle">
+                <button class="switchBtn" type="button" data-for="group3">Collapsible Group Item #3</button>
+            </div>
+            <div class="groupContent">
+                <p>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+document.querySelectorAll('.groupContent').forEach((el) => {
+    el.style.height = `${el.scrollHeight}px`;
+});
+
+document.querySelector('.contentWrap').addEventListener('click', (event) => {
+    if (event.target.classList.contains('switchBtn')) {
+        const groupWrap = document.getElementById(event.target.dataset.for);
+        const content = groupWrap.querySelector('.groupContent');
+
+        if (groupWrap.classList.contains('hide')) {
+            content.style.height = `${content.scrollHeight}px`;
+            groupWrap.classList.remove('hide');
+        } else {
+            content.style.height = 0;
+            groupWrap.classList.add('hide');
+        }
+    }
+}, false);
+</script>
+
+
+
+
+
+
