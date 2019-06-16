@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw3</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    .contentWrap {
+      border: #d8d8d8 0.5px solid;
+      width: 400px;
+      padding: 5px 10px;
+    }
+    .result, .btn {
+      border: #d8d8d8 0.5px solid;
+    }
+
+    .result {
+      width: 100%;
+      text-align: right;
+      padding: 0px 10px;
+      font-size: 45px;
+    }
+
+    .btnRow {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 5px;
+    }
+
+    .btn {
+      width: 50px;
+      text-align: center;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .equal {
+      width: 150px;
+      background-color: #ff8d00;
+    }
+    
+
+  </style>
+</head>
+</head>
+<body>
+  <div class="contentWrap">
+    <div class="btnRow">
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="btnRow">
+      <div class="btn" id="reset">AC</div>
+      <div class="btn operator" data-value="divide">÷</div>
+    </div>
+    <div class="btnRow">
+      <div class="btn num" data-value="7">7</div>
+      <div class="btn num" data-value="8">8</div>
+      <div class="btn num" data-value="9">9</div>
+      <div class="btn operator" data-value="multi">×</div>
+    </div>
+    <div class="btnRow">
+      <div class="btn num" data-value="4">4</div>
+      <div class="btn num" data-value="5">5</div>
+      <div class="btn num" data-value="6">6</div>
+      <div class="btn operator" data-value="minus">-</div>
+    </div>
+    <div class="btnRow">
+      <div class="btn num" data-value="1">1</div>
+      <div class="btn num" data-value="2">2</div>
+      <div class="btn num" data-value="3">3</div>
+      <div class="btn operator" data-value="plus">+</div>
+    </div>
+    <div class="btnRow">
+      <div class="btn num" data-value="0">0</div>
+      <div class="btn num" data-value=".">.</div>
+      <div class="btn operator equal" data-value="equal">=</div>
+    </div>
+  </div>
+  </body>
+</html>
+
+<script>
+var sum = 0;
+var operator = 'plus';
+var x = 0;
+var clear = 1;
+
+document.querySelectorAll('.num').forEach((el) => {
+  el.addEventListener('click', (event) => {
+    if (clear === 2) {
+      reset();
+    }
+
+    const resultEle = document.getElementById('result');
+    const value = event.target.dataset.value;
+
+    if (clear) {
+      if (value !== '.') {
+        resultEle.innerHTML = value;
+      } else {
+        resultEle.innerHTML = '0.';
+      }
+      clear = 0;
+    } else {
+      resultEle.innerHTML = `${resultEle.innerHTML}${value}`;
+    }
+    x = parseFloat(resultEle.innerHTML, 10);
+  }, false);
+});
+
+document.querySelectorAll('.operator').forEach((el) => {
+  el.addEventListener('click', (event) => {
+    const thisOperator = event.target.dataset.value;
+
+    if (!clear || thisOperator === 'equal') {
+      operate();
+    }
+
+    if (thisOperator !== 'equal') {
+      operator = thisOperator;
+      x = 0;
+      clear = 1;
+    } else {
+      clear = 2;
+    }
+
+    document.getElementById('result').innerHTML = sum;
+  }, false);
+});
+
+function operate() {
+  if (x === 0) {
+    return;
+  }
+
+  switch (operator) {
+    case 'plus':
+      sum += x;
+      break;
+
+    case 'minus':
+      sum -= x;
+      break;
+
+    case 'multi':
+      sum *= x;
+      break;
+
+    case 'divide':
+      sum /= x;
+      break;
+
+    default:
+      break;
+  }
+
+  sum = Math.round(sum * 1000000000) / 1000000000;
+}
+
+function reset() {
+  sum = 0;
+  operator = 'plus';
+  x = 0;
+  clear = 1;
+  document.getElementById('result').innerHTML = sum;
+}
+
+document.getElementById('reset').addEventListener('click', reset, false);
+</script>
