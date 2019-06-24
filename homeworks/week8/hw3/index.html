@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw1</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    .container {
+        max-width: 750px;
+        margin: auto;
+        border: #d9d6d6 0.5px solid;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .streamWrap {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .stream {
+        display:flex;
+        border: #d9d6d6 0.5px solid;
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .streamWrap > .stream:last-child {
+        margin-bottom: 0px;
+    }
+
+    .content.half {
+        width: 50%;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .stream__preview {
+        width: 320px;
+        height: 180px;
+    }
+
+    .profileWrap {
+        display: inline-flex;
+    }
+
+    .profileBannerWrap {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .profileBanner {
+        width: 100%;
+    }
+
+    .nameWrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .displayName > a {
+        font-weight: 600;
+        color: black;
+        text-decoration: none;
+    }
+
+    .displayName > a:hover {
+        text-decoration: underline;
+    }
+
+    .name > a {
+        color: black;
+        text-decoration: none;
+    }
+
+    .name > a:hover {
+        text-decoration: underline;
+    }
+
+    
+    .pageWrap {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .page {
+        text-align: center;
+        padding: 5px 20px;
+        cursor: pointer;
+        border: #2196f3 0.5px solid;
+        font-size: 18px;
+        border-radius: 5px;
+        background-color: none;
+        color: #2196f3;
+        cursor: pointer;
+    }
+
+    .page.disabled {
+        cursor: not-allowed;
+        color: #d9d6d6;
+        border-color: #d9d6d6;
+    }
+
+
+  </style>
+</head>
+<body>
+    <div class="container">
+        <div id="streamWrap" class="streamWrap">
+            <div class="stream">
+                <div class="content half">
+                    <a target="_blank" href="https://api.twitch.tv/kraken/streams/yoda">
+                    <img class="stream__preview" src="https://static-cdn.jtvnw.net/previews-ttv/live_user_voyboy-320x180.jpg"/>
+                    </a>
+                </div>
+                <div class="content half">
+                    <div class="profileWrap">
+                        <div class="profileBannerWrap">
+                            <img class="profileBanner" src="https://static-cdn.jtvnw.net/jtv_user_pictures/dfa78969cac714ec-profile_banner-480.jpeg">
+                        </div>
+                        <div class="nameWrap">
+                            <div class="displayName">
+                                <a target="_blank" href="https://www.twitch.tv/never_loses">status</a>
+                            </div>
+                            <div class="name">
+                                <a target="_blank" href="https://www.twitch.tv/never_loses">display_name</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pageWrap">
+            <button class="page disabled" id="pre" onclick="prePage()"><</button>
+            <button class="page disabled" id="next" onclick="nextPage()">></button>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+let currentPage = 0;
+let lastPage = 0;
+const limit = 20;
+
+let streamList = [];
+
+
+function loadMessage() {
+    const request = new XMLHttpRequest();
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            // streamList = JSON.parse(request.responseText);
+            // lastPage = Math.ceil(streamList.length / limit) - 1;
+            // showMessage();
+            // pageButtonDisable();
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+    };
+
+    request.open('GET', `https://api.twitch.tv/kraken/streams/?game=League%20of%20Legends&limit=${limit}&offset=${limit*currentPage}`, true);
+    request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
+    request.send();
+}
+
+function showMessage() {
+    const showpage = currentPage + 1;
+    let msgHtml = '';
+
+    for (let i = currentPage * limit; i < showpage * limit && i < streamList.length; i += 1) {
+        let content = '';
+        if (streamList[i].content) {
+            content = streamList[i].content;
+        }
+        msgHtml += `
+            <div class="stream" data-id="${streamList[i].id}">
+              <p class="content">${streamList[i].id} =====  ${content}</p>
+            </div>
+        `;
+    }
+
+    document.getElementById('streamWrap').innerHTML = msgHtml;
+}
+
+document
+loadMessage();
+
+
+function prePage() {
+    if (currentPage > 0) {
+        currentPage -= 1;
+        showMessage();
+        pageButtonDisable();
+    }
+}
+
+function nextPage() {
+    if (currentPage < lastPage) {
+        currentPage += 1;
+        showMessage();
+        pageButtonDisable();
+    }
+}
+
+function pageButtonDisable() {
+    if (currentPage === 0) {
+        document.getElementById('pre').classList.add('disabled');
+    } else {
+        document.getElementById('pre').classList.remove('disabled');
+    }
+
+    if (currentPage === lastPage) {
+        document.getElementById('next').classList.add('disabled');
+    } else {
+        document.getElementById('next').classList.remove('disabled');
+    }
+}
+
+</script>
+
+
+
+
+
+
+
+
