@@ -46,6 +46,8 @@
 
     .profileWrap {
         display: inline-flex;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
 
     .profileBannerWrap {
@@ -62,6 +64,8 @@
     .nameWrap {
         display: flex;
         flex-direction: column;
+        max-width: 250px;
+        margin-left: 10px;
     }
 
     .displayName > a {
@@ -113,54 +117,61 @@
 <body>
     <div class="container">
         <div id="streamWrap" class="streamWrap">
-            <div class="stream">
-                <div class="content half">
-                    <a target="_blank" href="https://api.twitch.tv/kraken/streams/yoda">
-                    <img class="stream__preview" src="https://static-cdn.jtvnw.net/previews-ttv/live_user_voyboy-320x180.jpg"/>
-                    </a>
-                </div>
-                <div class="content half">
-                    <div class="profileWrap">
-                        <div class="profileBannerWrap">
-                            <img class="profileBanner" src="https://static-cdn.jtvnw.net/jtv_user_pictures/dfa78969cac714ec-profile_banner-480.jpeg">
-                        </div>
-                        <div class="nameWrap">
-                            <div class="displayName">
-                                <a target="_blank" href="https://www.twitch.tv/never_loses">status</a>
-                            </div>
-                            <div class="name">
-                                <a target="_blank" href="https://www.twitch.tv/never_loses">display_name</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="pageWrap">
-            <button class="page disabled" id="pre" onclick="prePage()"><</button>
-            <button class="page disabled" id="next" onclick="nextPage()">></button>
+            <button class="page" id="more" onclick="loadData();">more</button>
         </div>
     </div>
 </body>
 </html>
 
 <script>
-let currentPage = 0;
-let lastPage = 0;
+let offset = 0;
 const limit = 20;
 
 let streamList = [];
 
 
-function loadMessage() {
+function loadData() {
     const request = new XMLHttpRequest();
 
     request.onload = () => {
         if (request.status >= 200 && request.status < 400) {
-            // streamList = JSON.parse(request.responseText);
-            // lastPage = Math.ceil(streamList.length / limit) - 1;
-            // showMessage();
-            // pageButtonDisable();
+            streamList = JSON.parse(request.responseText);
+            streamList = streamList.streams;
+
+            for (let i = 0; i < streamList.length; i += 1) {
+                const child = document.createElement('div');
+                child.classList.add('stream');
+                child.innerHTML = `
+                    <div class="content half">
+                        <a target="_blank" href="${streamList[i].channel.url}">
+                        <img class="stream__preview" src="${streamList[i].preview.medium}"/>
+                        </a>
+                    </div>
+                    <div class="content half">
+                        <div class="profileWrap">
+                            <div class="profileBannerWrap">
+                                <a target="_blank" href="${streamList[i].channel.url + '/videos'}">
+                                    <img class="profileBanner" src="${streamList[i].channel.logo}">
+                                </a>
+                            </div>
+                            <div class="nameWrap">
+                                <div class="displayName">
+                                    <a target="_blank" href="${streamList[i].channel.url + '/videos'}">${streamList[i].channel.status}</a>
+                                </div>
+                                <div class="name">
+                                    <a target="_blank" href="https://www.twitch.tv/never_loses">${streamList[i].channel.display_name}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('streamWrap').appendChild(child);
+            }
+
+            offset += streamList.length;
         } else {
             console.log('error', request.status);
             alert('系統不穩定，請再試一次');
@@ -172,64 +183,13 @@ function loadMessage() {
         alert('系統不穩定，請再試一次');
     };
 
-    request.open('GET', `https://api.twitch.tv/kraken/streams/?game=League%20of%20Legends&limit=${limit}&offset=${limit*currentPage}`, true);
+    request.open('GET', `https://api.twitch.tv/kraken/streams/?game=League%20of%20Legends&limit=${limit}&offset=${offset}`, true);
     request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
     request.send();
 }
 
-function showMessage() {
-    const showpage = currentPage + 1;
-    let msgHtml = '';
 
-    for (let i = currentPage * limit; i < showpage * limit && i < streamList.length; i += 1) {
-        let content = '';
-        if (streamList[i].content) {
-            content = streamList[i].content;
-        }
-        msgHtml += `
-            <div class="stream" data-id="${streamList[i].id}">
-              <p class="content">${streamList[i].id} =====  ${content}</p>
-            </div>
-        `;
-    }
-
-    document.getElementById('streamWrap').innerHTML = msgHtml;
-}
-
-document
-loadMessage();
-
-
-function prePage() {
-    if (currentPage > 0) {
-        currentPage -= 1;
-        showMessage();
-        pageButtonDisable();
-    }
-}
-
-function nextPage() {
-    if (currentPage < lastPage) {
-        currentPage += 1;
-        showMessage();
-        pageButtonDisable();
-    }
-}
-
-function pageButtonDisable() {
-    if (currentPage === 0) {
-        document.getElementById('pre').classList.add('disabled');
-    } else {
-        document.getElementById('pre').classList.remove('disabled');
-    }
-
-    if (currentPage === lastPage) {
-        document.getElementById('next').classList.add('disabled');
-    } else {
-        document.getElementById('next').classList.remove('disabled');
-    }
-}
-
+loadData();
 </script>
 
 
