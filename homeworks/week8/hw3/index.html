@@ -119,7 +119,7 @@
         <div id="streamWrap" class="streamWrap">
         </div>
         <div class="pageWrap">
-            <button class="page" id="more" onclick="loadData();">more</button>
+            <button class="page" id="more" onclick="loadData();">載入更多</button>
         </div>
     </div>
 </body>
@@ -171,7 +171,11 @@ function loadData() {
                 document.getElementById('streamWrap').appendChild(child);
             }
 
-            offset += streamList.length;
+            if (streamList.length > 0) {
+                offset += streamList.length;
+            } else {
+                document.getElementById('more').style.display = 'none';
+            }
         } else {
             console.log('error', request.status);
             alert('系統不穩定，請再試一次');
