@@ -158,27 +158,19 @@
     .pageWrap {
         text-align: center;
         padding: 10px;
+        height: 70px;
     }
 
     .page {
         text-align: center;
         padding: 5px 20px;
-        cursor: pointer;
-        border: #2196f3 0.5px solid;
         font-size: 18px;
-        border-radius: 5px;
-        background-color: none;
-        color: #2196f3;
+        color: #b8dafa;
         cursor: pointer;
     }
-
-    .page.disabled {
-        cursor: not-allowed;
-        color: #d9d6d6;
-        border-color: #d9d6d6;
+    .page.hide{
+        display: none;
     }
-
-
   </style>
 </head>
 <body>
@@ -195,7 +187,7 @@
         <p class="description">Top 24 popular live streams sorted by current viewers</p>
         <div id="streamWrap" class="streamWrap"></div>
         <div class="pageWrap">
-            <button class="page" id="more" onclick="loadData();">載入更多</button>
+            <span class="page" id="more">Loading...</span>
         </div>
     </div>
 </body>
@@ -203,6 +195,7 @@
 
 <script>
 let chosenGame = '';
+let loading = false;
 let offset = 0;
 const limit = 24;
 
@@ -259,7 +252,6 @@ function changeGame(el, init) {
     offset = 0;
     el.classList.add('show');
     document.getElementById('gameTitle').innerHTML = chosenGame;
-    document.getElementById('more').style.display = '';
     loadData();
 }
 
@@ -300,11 +292,9 @@ function loadData() {
                 document.getElementById('streamWrap').appendChild(child);
             }
 
-            if (streamList.length > 0) {
-                offset += streamList.length;
-            } else {
-                document.getElementById('more').style.display = 'none';
-            }
+            offset += streamList.length;
+            document.getElementById('more').classList.add('hide');
+            loading = false;
         } else {
             console.log('error', request.status);
             alert('系統不穩定，請再試一次');
@@ -314,12 +304,25 @@ function loadData() {
     request.onerror = () => {
         console.log('error', request.status);
         alert('系統不穩定，請再試一次');
+        loading = false;
     };
 
-    request.open('GET', `https://api.twitch.tv/kraken/streams/?game=${encodeURIComponent(chosenGame)}&limit=${limit}&offset=${offset}`, true);
-    request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
-    request.send();
+
+    if (!loading) {
+        request.open('GET', `https://api.twitch.tv/kraken/streams/?game=${encodeURIComponent(chosenGame)}&limit=${limit}&offset=${offset}`, true);
+        request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
+        request.send();
+        document.getElementById('more').classList.remove('hide');
+        loading = true;
+    }
 }
+
+
+window.addEventListener('scroll', (event) => {
+    if (window.pageYOffset + window.innerHeight >= document.querySelector('.pageWrap').offsetTop) {
+        loadData();
+    }
+}, false);
 </script>
 
 
