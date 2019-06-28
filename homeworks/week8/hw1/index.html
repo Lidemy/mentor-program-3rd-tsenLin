@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw1</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    .flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    #awardImg {
+      max-width: 400px;
+      margin: 20px; 
+    }
+
+    #play {
+      text-align: center;
+      padding: 10px 30px;
+      cursor: pointer;
+      border: #f61313 0.5px solid;
+      font-size: 20px;
+      border-radius: 5px;
+      background-color: red;
+      color: white;
+    }
+    #play:focus {
+      outline:none;
+    }
+    #play:active, #play:hover {
+      background-color: #d90606;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex">
+    <h1 id="award"></h1>
+    <img id="awardImg" src="">
+    <button id="play" onclick="drawAward()">抽獎</button>
+    <p>頭獎: 5%, 二獎: 20%, 三獎: 30%, 銘謝惠顧: 45%</p>
+  </div>
+</body>
+</html>
+
+<script>
+function drawAward() {
+    const request = new XMLHttpRequest();
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            console.log(request.responseText);
+
+            const response = JSON.parse(request.responseText);
+
+            let award = '';
+            let img = '';
+            let backgroundColor = 'white';
+            let color = 'black';
+
+            switch (response.prize) {
+            case 'FIRST':
+                award = '「恭喜你中頭獎了！日本東京來回雙人遊！」';
+                img = './airplane.jpg';
+                backgroundColor = '#00BFFF';
+                break;
+            case 'SECOND':
+                award = '「二獎！90 吋電視一台！」';
+                img = './tv.jpg';
+                break;
+            case 'THIRD':
+                award = '「恭喜你抽中三獎：知名 YouTuber 簽名握手會入場券一張，bang！」';
+                img = './youtube.jpg';
+                break;
+            default:
+                award = '「銘謝惠顧」';
+                img = '';
+                backgroundColor = 'black';
+                color = 'white';
+                break;
+            }
+
+            document.getElementById('award').innerHTML = award;
+            document.getElementById('award').style.color = color;
+            document.getElementById('awardImg').src = img;
+            document.querySelector('body').style.backgroundColor = backgroundColor;
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+    };
+
+    request.open('GET', 'https://dvwhnbka7d.execute-api.us-east-1.amazonaws.com/default/lottery', true);
+    request.send();
+}
+</script>
+
+
+
+
+
+
+
+

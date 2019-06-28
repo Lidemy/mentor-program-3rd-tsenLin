@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw1</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    body {
+        background-image: url(https://i.imgur.com/oAf6eLy.jpg);
+        margin: 0px;
+    }
+
+    .navbar {
+        background-color: #343a40;
+        padding: 10px;
+        position: fixed;
+        top: 0px;
+        right: 0px;
+        left: 0px;
+        z-index: 2;
+    }
+
+    .navbar__title {
+        display: inline-block;
+        color: white;
+    }
+
+    .navbar__menu {
+        display: inline-block;
+        color: #A3A5A7;
+    }
+
+    .navbar__link {
+        margin-left: 15px;
+        cursor: pointer;
+    }
+
+    .navbar__link.show {
+        color: white;
+    }
+
+    .text-right {
+        text-align: right;
+        position: absolute;
+        right: 0px;
+        margin: 0px 10px;
+    }
+
+    mark {
+        background-color: white;
+        padding: 3px;
+    }
+
+    .container {
+        max-width: 1010px;
+        margin: auto;
+        padding: 10px;
+    }
+
+    .gameTitle {
+        color: white;
+        text-align: center;
+        font-size: 55px;
+        margin-bottom: 0px;
+    }
+
+    .description {
+        color: #b8dafa;
+        text-align: center;
+        font-size: 20px;
+        margin-top: 0px;
+    }
+
+    .streamWrap {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .stream {
+        display:flex;
+        flex-direction: column;
+        border-radius: 5px;
+        padding: 5px;
+        margin-right: 5px;
+        margin-top: 5px;
+        background-color: #282828;
+    }
+
+    .stream:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 2rem black;
+        z-index: 1; 
+    }
+
+    .stream__preview {
+        width: 320px;
+        height: 180px;
+    }
+
+    .profileWrap {
+        display: inline-flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .profileBannerWrap {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .profileBanner {
+        width: 100%;
+    }
+
+    .nameWrap {
+        display: flex;
+        flex-direction: column;
+        max-width: 250px;
+        margin-left: 10px;
+    }
+
+    .displayName {
+        text-overflow: ellipsis; 
+        overflow: hidden; 
+        white-space: nowrap;
+        color: white;
+    }
+
+    .displayName > a {
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+    }
+
+    .displayName > a:hover {
+        text-decoration: underline;
+    }
+
+    .name {
+        text-overflow: ellipsis; 
+        overflow: hidden; 
+        white-space: nowrap;
+        color: white;
+    }
+
+    .name > a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .name > a:hover {
+        text-decoration: underline;
+    }
+
+    
+    .pageWrap {
+        text-align: center;
+        padding: 10px;
+        height: 70px;
+    }
+
+    .page {
+        text-align: center;
+        padding: 5px 20px;
+        font-size: 18px;
+        color: #b8dafa;
+        cursor: pointer;
+    }
+    .page.hide{
+        display: none;
+    }
+  </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar__title">Twitch Live Games</div>
+        <nav class="navbar__menu"></nav>
+        <div class="navbar__title text-right">
+            Top 5 popular games on Twitch
+            <mark>NOW</mark>
+        </div>
+    </div>
+    <div class="container">
+        <h1 id="gameTitle" class="gameTitle">Fortnite</h1>
+        <p class="description">Top 24 popular live streams sorted by current viewers</p>
+        <div id="streamWrap" class="streamWrap"></div>
+        <div class="pageWrap">
+            <span class="page" id="more">Loading...</span>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+let chosenGame = '';
+let loading = false;
+let offset = 0;
+const limit = 24;
+
+function getTopGames() {
+    const request = new XMLHttpRequest();
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            let gameList = JSON.parse(request.responseText);
+            gameList = gameList.top;
+
+            if (gameList.length > 0) {
+                for (let i = 0; i < gameList.length; i += 1) {
+                    const child = document.createElement('a');
+                    child.classList.add('navbar__link'); 
+                    child.innerHTML = gameList[i].game.name;
+                    child.dataset.name = gameList[i].game.name;
+                    document.getElementsByClassName('navbar__menu')[0].appendChild(child);
+
+                    if (i === 0) {
+                        changeGame(child, true);
+                    }
+                }
+            }
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+    };
+
+    request.open('GET', 'https://api.twitch.tv/kraken/games/top?limit=5', true);
+    request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
+    request.send();
+}
+
+document.getElementsByClassName('navbar__menu')[0].addEventListener('click', (event) => {
+    changeGame(event.target, false);
+});
+
+getTopGames();
+
+//  ============== load streams ======================
+function changeGame(el, init) {
+    if (!init) {
+        document.querySelector('.navbar__link.show').classList.remove('show');
+        document.querySelector('.streamWrap').innerHTML = '';
+    }
+    chosenGame = el.dataset.name;
+    offset = 0;
+    el.classList.add('show');
+    document.getElementById('gameTitle').innerHTML = chosenGame;
+    loadData();
+}
+
+function loadData() {
+    const request = new XMLHttpRequest();
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            let streamList = JSON.parse(request.responseText);
+            streamList = streamList.streams;
+
+            for (let i = 0; i < streamList.length; i += 1) {
+                const child = document.createElement('div');
+                child.classList.add('stream');
+                child.innerHTML = `
+                    <div class="previewWrap">
+                        <a target="_blank" href="${streamList[i].channel.url}">
+                        <img class="stream__preview" src="${streamList[i].preview.medium}"/>
+                        </a>
+                    </div>
+                    <div class="profileWrap">
+                        <div class="profileBannerWrap">
+                            <a target="_blank" href="${streamList[i].channel.url + '/videos'}">
+                                <img class="profileBanner" src="${streamList[i].channel.logo}">
+                            </a>
+                        </div>
+                        <div class="nameWrap">
+                            <div class="displayName">
+                                <a target="_blank" href="${streamList[i].channel.url + '/videos'}">${streamList[i].channel.status}</a>
+                            </div>
+                            <div class="name">
+                                <a target="_blank" href="https://www.twitch.tv/never_loses">${streamList[i].channel.display_name}</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('streamWrap').appendChild(child);
+            }
+
+            offset += streamList.length;
+            document.getElementById('more').classList.add('hide');
+            loading = false;
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+        loading = false;
+    };
+
+
+    if (!loading) {
+        request.open('GET', `https://api.twitch.tv/kraken/streams/?game=${encodeURIComponent(chosenGame)}&limit=${limit}&offset=${offset}`, true);
+        request.setRequestHeader('Client-ID', 'g79xv1ajh7dualmssudzls1n4gh5le');
+        request.send();
+        document.getElementById('more').classList.remove('hide');
+        loading = true;
+    }
+}
+
+
+window.addEventListener('scroll', (event) => {
+    if (window.pageYOffset + window.innerHeight >= document.querySelector('.pageWrap').offsetTop) {
+        loadData();
+    }
+}, false);
+</script>
+
+
+
+
+
+
+
+

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>hw1</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    .container {
+        max-width: 750px;
+        margin: auto;
+        border: #d9d6d6 0.5px solid;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .messageWrap {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .message {
+        display:flex;
+        border: #d9d6d6 0.5px solid;
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .messageWrap > .message:last-child {
+        margin-bottom: 0px;
+    }
+    
+    .pageWrap {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .page {
+        text-align: center;
+        padding: 5px 20px;
+        cursor: pointer;
+        border: #2196f3 0.5px solid;
+        font-size: 18px;
+        border-radius: 5px;
+        background-color: none;
+        color: #2196f3;
+        cursor: pointer;
+    }
+
+    .page.disabled {
+        cursor: not-allowed;
+        color: #d9d6d6;
+        border-color: #d9d6d6;
+    }
+
+    #writingBoard {
+        display:flex;
+        border: #d9d6d6 0.5px solid;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        flex-direction: column;
+    }
+
+    #writingBoard > h5 {
+        font-size: 18px;
+        margin: 10px 0px;
+    }
+
+    #newMessage {
+        margin-bottom: 10px;
+    }
+
+    #send {
+        text-align: center;
+        padding: 10px 30px;
+        cursor: pointer;
+        border: #0088f4 0.5px solid;
+        font-size: 15px;
+        border-radius: 5px;
+        background-color: #2196F3;
+        color: white;
+        width: 100px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="messageWrap" class="messageWrap"></div>
+    <div class="pageWrap">
+      <button class="page disabled" id="pre" onclick="prePage()"><</button>
+      <button class="page disabled" id="next" onclick="nextPage()">></button>
+    </div>
+    <form id="writingBoard" onsubmit="return false;">
+        <h5>來留言吧!</h5>
+        <textarea id="newMessage" rows="5"></textarea>
+        <button id="send" onclick="sendMessage()">送出</button>
+    </form>
+  </div>
+</body>
+</html>
+
+<script>
+let currentPage = 0;
+let lastPage = 0;
+const limit = 20;
+
+let messageList = [];
+
+loadMessage();
+
+function loadMessage() {
+    const request = new XMLHttpRequest();
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            messageList = JSON.parse(request.responseText);
+            lastPage = Math.ceil(messageList.length / limit) - 1;
+            showMessage();
+            pageButtonDisable();
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+    };
+
+    request.open('GET', `https://lidemy-book-store.herokuapp.com/posts?_sort=id&_order=asc`, true);
+    request.send();
+}
+
+function showMessage() {
+    const showpage = currentPage + 1;
+    let msgHtml = '';
+
+    for (let i = currentPage * limit; i < showpage * limit && i < messageList.length; i += 1) {
+        let content = '';
+        if (messageList[i].content) {
+            content = messageList[i].content;
+        }
+        msgHtml += `
+            <div class="message" data-id="${messageList[i].id}">
+              <p class="content">${messageList[i].id} =====  ${content}</p>
+            </div>
+        `;
+    }
+
+    document.getElementById('messageWrap').innerHTML = msgHtml;
+}
+
+function prePage() {
+    if (currentPage > 0) {
+        currentPage -= 1;
+        showMessage();
+        pageButtonDisable();
+    }
+}
+
+function nextPage() {
+    if (currentPage < lastPage) {
+        currentPage += 1;
+        showMessage();
+        pageButtonDisable();
+    }
+}
+
+function pageButtonDisable() {
+    if (currentPage === 0) {
+        document.getElementById('pre').classList.add('disabled');
+    } else {
+        document.getElementById('pre').classList.remove('disabled');
+    }
+
+    if (currentPage === lastPage) {
+        document.getElementById('next').classList.add('disabled');
+    } else {
+        document.getElementById('next').classList.remove('disabled');
+    }
+}
+
+
+function sendMessage() {
+    const request = new XMLHttpRequest();
+    const content = document.getElementById('newMessage').value;
+
+    request.onload = () => {
+        if (request.status >= 200 && request.status < 400) {
+            const response = JSON.parse(request.responseText);
+            if (response.id) {
+                const msgHtml = `
+                    <div class="message">
+                      <p class="content">${response.content}</p>
+                    </div>
+                `;
+                document.getElementById('messageWrap').innerHTML += msgHtml;
+
+                messageList.push(response);
+                lastPage = Math.ceil(messageList.length / limit) - 1;
+
+                document.getElementById('newMessage').value = '';
+            }
+        } else {
+            console.log('error', request.status);
+            alert('系統不穩定，請再試一次');
+        }
+    };
+
+    request.onerror = () => {
+        console.log('error', request.status);
+        alert('系統不穩定，請再試一次');
+    };
+
+    request.open('POST', 'https://lidemy-book-store.herokuapp.com/posts', true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send(`content=${encodeURIComponent(content)}`);
+}
+</script>
+
+
+
+
+
+
+
+
